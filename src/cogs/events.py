@@ -71,10 +71,10 @@ class EventCommands(app_commands.Group):
 
             event = await guild.create_scheduled_event(**event_params)
             
-            await interaction.followup.send(f"✅ Event **{name}** has been created! Start time: {event_time.strftime('%Y-%m-%d %H:%M UTC')}")
+            await interaction.followup.send(f"Event **{name}** has been created! Start time: {event_time.strftime('%Y-%m-%d %H:%M UTC')}")
 
         except discord.HTTPException as e:
-            await interaction.followup.send(f"⚠️ Failed to create event: {e}")
+            await interaction.followup.send(f"Failed to create event: {e}")
 
     @app_commands.command(name="list", description="List upcoming Discord events")
     async def list_events(self, interaction: Interaction):
@@ -95,11 +95,11 @@ class EventCommands(app_commands.Group):
             await interaction.followup.send("No upcoming events found.")
             return
 
-        embed = discord.Embed(title="📅 Upcoming Events", color=discord.Color.blue())
+        embed = discord.Embed(title="Upcoming Events", color=discord.Color.blue())
         for event in events:
             embed.add_field(
                 name=event.name,
-                value=f"📆 **Starts:** {event.start_time.strftime('%Y-%m-%d %H:%M UTC')}\n🔗 **Location:** {event.location if event.location else 'Discord Voice Channel'}\n📝 **Description:** {event.description or 'No description'}\n**ID** {event.id}",
+                value=f"**Starts:** {event.start_time.strftime('%Y-%m-%d %H:%M UTC')}\n**Location:** {event.location if event.location else 'Discord Voice Channel'}\n**Description:** {event.description or 'No description'}\n**ID** {event.id}",
                 inline=False
             )
 
@@ -123,14 +123,14 @@ class EventCommands(app_commands.Group):
 
         event = guild.get_scheduled_event(int(event_id))
         if not event:
-            await interaction.followup.send("⚠️ No event found with that ID.")
+            await interaction.followup.send("No event found with that ID.")
             return
 
         try:
             await event.delete()
-            await interaction.followup.send(f"🗑️ Event **{event.name}** has been deleted.")
+            await interaction.followup.send(f"Event **{event.name}** has been deleted.")
         except discord.HTTPException as e:
-            await interaction.followup.send(f"⚠️ Failed to delete event: {e}")
+            await interaction.followup.send(f"Failed to delete event: {e}")
 
     @app_commands.command(name="edit", description="Edit an existing event's details")
     @role_check()

@@ -30,6 +30,14 @@ class Renfield_SQL:
         self.key = hashlib.sha256(ENCRYPTION_KEY.encode()).digest()
 
     def connect(self):
+        """Connect to database
+
+        Raises:
+            RuntimeError: Fails to connect to database
+
+        Returns:
+            _type_: _description_
+        """
         try:
             self.connection = pymysql.connect(**config)
             self.cursor = self.connection.cursor()
@@ -38,6 +46,7 @@ class Renfield_SQL:
             raise RuntimeError(f"MySQL Connection Failed: {err}")
 
     def disconnect(self):
+        """Disconnect from database"""
         try:
             if hasattr(self, "cursor") and self.cursor:
                 self.cursor.close()
@@ -47,12 +56,15 @@ class Renfield_SQL:
             print(f"Error closing MySQL connection: {err}")
 
     def commit(self):
+        """Commit change to the database"""
         try:
             if hasattr(self, "connection") and self.connection:
                 self.connection.commit()
         except pymysql.MySQLError as err:
             print(f"Error committing transaction: {err}")
 
+
+## To Be Removed/Editted
     def encrypt(self, data):
         data = str(data).encode()
         cipher = AES.new(self.key, AES.MODE_GCM)  # AES-GCM Mode

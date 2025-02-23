@@ -21,7 +21,7 @@ def role_check():
         REQUIRED_ROLES = os.getenv("REQUIRED_ROLES").split(",")
         
         if interaction.guild is None:
-            raise app_commands.CheckFailure("❌ This command can only be used in a server!")
+            raise app_commands.CheckFailure("This command can only be used in a server!")
 
         user_roles = [role.name for role in interaction.user.roles]  # Get user roles by name
         if any(role in user_roles for role in REQUIRED_ROLES):
@@ -29,8 +29,8 @@ def role_check():
 
         # ✅ Ensure the bot responds before raising an error
         if not interaction.response.is_done():
-            await interaction.response.send_message("❌ You do not have permission to use this command!", ephemeral=True)
+            await interaction.response.send_message("You do not have permission to use this command!", ephemeral=True)
         
-        raise app_commands.CheckFailure("❌ You do not have permission to use this command!")
+        raise app_commands.CheckFailure("You do not have permission to use this command!")
 
     return app_commands.check(predicate)

@@ -9,7 +9,15 @@ from helper.role_requirements import role_check
 
 
 async def autocomplete_groups(interaction: Interaction, current: str):
-    """Autocomplete function for existing group names."""
+    """Gets a list of groups for autocompletion
+
+    Args:
+        interaction (Interaction): Discord Interaction Variable
+        current (str): _description_
+
+    Returns:
+        _type_: Autocomplete Dropdown Info
+    """
     db = Renfield_SQL()
     cursor = db.connect()
 
@@ -34,6 +42,11 @@ class VoteButton(discord.ui.Button):
         self.vote_id = vote_id
 
     async def callback(self, interaction: Interaction):
+        """The callback function for whenever the vote button is clicked
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+        """
         await interaction.response.defer(ephemeral=True)
         db = Renfield_SQL()
         cursor = db.connect()
@@ -65,7 +78,7 @@ class VoteButton(discord.ui.Button):
                 await interaction.followup.send(f"You voted for {self.label}!", ephemeral=True)
 
         except Exception as e:
-            await interaction.followup.send("❌ An error occurred while processing your vote.", ephemeral=True)
+            await interaction.followup.send("An error occurred while processing your vote.", ephemeral=True)
             print(f"Error in voting callback: {e}")
 
         finally:
@@ -77,6 +90,14 @@ class VoteCommands(app_commands.Group):
     @role_check()
     @app_commands.autocomplete(group=autocomplete_groups)
     async def initiate_vote(self, interaction: Interaction, name: str, options: str, group: str = None):
+        """Create a new vote
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            name (str): Name of the Vote
+            options (str): Description of the Topic for vote
+            group (str, optional): Group for the Vote topic (EG, AGM2025 etc). Defaults to None.
+        """
         await interaction.response.defer(thinking=True)
 
         options_list = [opt.strip() for opt in options.split(",") if opt.strip()]
@@ -118,6 +139,12 @@ class VoteCommands(app_commands.Group):
     @app_commands.command(name="results", description="Show results of a vote")
     @role_check()
     async def vote_results(self, interaction: Interaction, vote_id: int):
+        """Display the results of the vote with vote_id
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            vote_id (int): ID of the vote to display
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -167,6 +194,12 @@ class VoteCommands(app_commands.Group):
     @app_commands.command(name="end", description="End a vote")
     @role_check()
     async def end_vote(self, interaction: Interaction, vote_id: int):
+        """End a vote
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            vote_id (int): ID of the vote to be ended
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -192,6 +225,12 @@ class VoteCommands(app_commands.Group):
     @app_commands.command(name="show", description="Re-show an active vote")
     @role_check()
     async def show_vote(self, interaction: Interaction, vote_id: int):
+        """Display an active vote
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            vote_id (int): ID of vote to display
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -221,7 +260,12 @@ class VoteCommands(app_commands.Group):
     @app_commands.command(name="new_group", description="Create a new vote group")
     @role_check()
     async def new_group(self, interaction: Interaction, group_name: str):
-        """Creates a new vote group if it doesn't already exist."""
+        """Creates a new vote group if it doesn't already exist
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            group_name (str): Name of the new group
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -231,11 +275,11 @@ class VoteCommands(app_commands.Group):
         existing_group = cursor.fetchone()
 
         if existing_group:
-            await interaction.followup.send(f"⚠️ Group **{group_name}** already exists!", ephemeral=True)
+            await interaction.followup.send(f"Group **{group_name}** already exists!", ephemeral=True)
         else:
             cursor.execute("INSERT INTO vote_groups (group_name) VALUES (%s)", (group_name,))
             db.commit()
-            await interaction.followup.send(f"✅ Vote group **{group_name}** has been created!", ephemeral=True)
+            await interaction.followup.send(f"Vote group **{group_name}** has been created!", ephemeral=True)
 
         db.disconnect()
         
@@ -243,6 +287,11 @@ class VoteCommands(app_commands.Group):
     @app_commands.command(name="list_groups", description="List all available vote groups")
     @role_check()
     async def list_groups(self, interaction: Interaction):
+        """Lists all available vote groups
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -265,6 +314,12 @@ class VoteCommands(app_commands.Group):
     @role_check()
     @app_commands.autocomplete(group_name=autocomplete_groups)
     async def all_results(self, interaction: Interaction, group_name: str):
+        """Display results for all votes in a group
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            group_name (str): Name of the group to display
+        """
         await interaction.response.defer(thinking=True)
 
         db = Renfield_SQL()
@@ -305,23 +360,23 @@ class Voting(commands.Cog):
             if isinstance(error, app_commands.CheckFailure):
                 # Ensure interaction is not already responded to
                 if interaction.response.is_done():
-                    await interaction.followup.send("❌ You do not have permission to use this command!", ephemeral=True)
+                    await interaction.followup.send("You do not have permission to use this command!", ephemeral=True)
                 else:
-                    await interaction.response.send_message("❌ You do not have permission to use this command!", ephemeral=True)
+                    await interaction.response.send_message("You do not have permission to use this command!", ephemeral=True)
                 return  # Exit after handling the error
 
             elif isinstance(error, app_commands.CommandInvokeError):
                 if interaction.response.is_done():
-                    await interaction.followup.send("❌ An error occurred while executing the command.", ephemeral=True)
+                    await interaction.followup.send("An error occurred while executing the command.", ephemeral=True)
                 else:
-                    await interaction.response.send_message("❌ An error occurred while executing the command.", ephemeral=True)
+                    await interaction.response.send_message("An error occurred while executing the command.", ephemeral=True)
                 print(f"CommandInvokeError: {error}")
 
             else:
                 if interaction.response.is_done():
-                    await interaction.followup.send("❌ An unknown error occurred.", ephemeral=True)
+                    await interaction.followup.send("An unknown error occurred.", ephemeral=True)
                 else:
-                    await interaction.response.send_message("❌ An unknown error occurred.", ephemeral=True)
+                    await interaction.response.send_message("An unknown error occurred.", ephemeral=True)
                 print(f"Unknown Error: {error}")
 
         except discord.errors.InteractionResponded:
@@ -329,7 +384,7 @@ class Voting(commands.Cog):
         except Exception as e:  # Fix incorrect exception handling
             print(f"Error: {e}")
             if not interaction.response.is_done():
-                await interaction.response.send_message("❌ Unexpected error occurred!", ephemeral=True)
+                await interaction.response.send_message("Unexpected error occurred!", ephemeral=True)
 
 
 async def setup(bot):

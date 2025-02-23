@@ -6,6 +6,15 @@ import random
 class DiceRollerCommands(app_commands.Group):
     @app_commands.command(name="roll", description="Roll a number of dice at X difficulty")
     async def roll_dice(self, interaction: Interaction, number_of_dice: int, difficulty: int , speciality: bool, comment: str | None):
+        """Rolls a number of dice at a specified difficulty
+
+        Args:
+            interaction (Interaction): Discord Interaction Variable
+            number_of_dice (int): Number of dice to roll
+            difficulty (int): Difficulty to roll the dice
+            speciality (bool): Whether a speciality is applied
+            comment (str | None): Optional comment
+        """
         await interaction.response.defer(thinking=True)
 
         results = [random.randint(1, 10) for _ in range(number_of_dice)]

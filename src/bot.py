@@ -47,16 +47,18 @@ async def on_ready():
         print(f"Logged in as {bot.user} - Ready!")
     except Exception as e:
         logger.error(f"Failed to sync commands: {e}", exc_info=True)
-
+        
+    
+# Does not work? Unsure why
 @bot.tree.command(name="sync", description="Sync Commands")
 async def sync(interaction: Interaction):
     await interaction.response.defer(thinking=True)
     try:
         await bot.tree.sync()
-        await interaction.followup.send("✅ Commands successfully synchronized!")
+        await interaction.followup.send("Commands successfully synchronized!")
     except Exception as e:
         logger.error(f"Failed to sync commands: {e}", exc_info=True)
-        await interaction.followup.send(f"❌ Failed to sync commands. Check logs for details.")
+        await interaction.followup.send(f"Failed to sync commands. Check logs for details.")
     
 
 async def main():
