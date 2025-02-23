@@ -1,107 +1,95 @@
-# renfieldbot
+# Discord Bot Setup Guide
 
-## About Renfield
+## Prerequisites
+Before setting up the bot, ensure you have the following installed:
 
+- [Python 3.9+](https://www.python.org/downloads/)
+- [Git](https://git-scm.com/)
+- [pip (Python package manager)](https://pip.pypa.io/en/stable/)
+- [Virtual Environment (venv)](https://docs.python.org/3/library/venv.html)
 
-## Setting up on AWS
+## Installation Steps
 
-### Migration
+### 1. Clone the Repository
+```sh
+git clone https://github.com/BlazingFury3008/renfieldbot_v2
+cd your-bot
+```
 
-If you are migrating the bot to another server instance, you should first take a download of the existing database.
+### 2. Create a Virtual Environment
+```sh
+python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+venv\Scripts\activate    # On Windows
+```
 
-> renfield> mariadb-dump discordbot -p > /tmp/dump.sql
+### 3. Install Dependencies
+```sh
+pip install -r requirements.txt
+```
 
-Also take a download of the encryption key, or everyone will need to re-link their characters again.
+### 4. Create a `.env` File
+Create a `.env` file in the root directory of the project and add the following environment variables:
 
-> renfield> ls /home/renfield/.wp_key
+```ini
+# Discord Bot Token
+DISCORD_TOKEN="your-discord-bot-token"
 
-### Launch instance
+# Log Directory
+LOG_HOME="./logs"
 
-https://aws.amazon.com/free/
+# Database Credentials
+DATABASE_USERNAME="your-database-username"
+DATABASE_PASSWORD="your-database-password"
 
-1. Log in to console.aws.amazon.com
-1. Select EC2 service
-1. Click "Launch Instance"
-1. Name: Renfield
-1. Quick Start:
-1.1 amazon Linux 2023, 64bit (x86) (free tier)
-1.1 t2.micro (free tier)
-1.1 Create new key pair
-1.1 Allow SSH from... My IP
-1.1 Advanced details - create an IAM profile with access to PollyVoice
-1. [ review and launch ]
-1. Launch
+# Encryption Key
+ENCRYPTION_KEY="your-encryption-key"
 
-### Allocate Elastic IP address
+# Required Roles
+REQUIRED_ROLES="Admin,RenfieldTest"
 
-This is optional, but means you don't have to change the connection IP address every time to reboot the instance.
+# OpenAI API Configuration (if applicable)
+GPT_API_URL=""
+OPENAI_API_KEY="your-openai-api-key"
+OPENAI_MODEL="gpt-4o-mini"
+OPENAI_SYSTEM_CONTENT=""
 
-1. EC2 -> Elastic IPs
-1. [Allocate Elastic IP address]
+# Default Voice Channel ID
+DEFAULT_VOICE_CHANNEL_ID="your-voice-channel-id"
+```
 
-### create an IAM role with polly access
+### 5. Run the Bot
+Once the `.env` file is set up, start the bot using:
+```sh
+python bot.py
+```
 
-This is so that you can use the /speak command
+### 6. Running the Bot in Development Mode
+For active development, you can use:
+```sh
+python -m bot
+```
 
-### Update and install OS packages
+### 7. Troubleshooting
+- **Issue: Bot doesn't start**
+  - Ensure the `.env` file is correctly formatted and all required values are set.
+  - Verify that your `DISCORD_TOKEN` is valid.
 
-Log on with SSH to instance as ec2-user, with key pair
+- **Issue: Permissions error**
+  - Ensure the bot has necessary permissions in the Discord server.
 
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
+- **Issue: Dependencies not installed correctly**
+  - Try running `pip install --upgrade -r requirements.txt`.
 
+```
 
-Upload scripts to /tmp
+### Contributing
+If you'd like to contribute to this project, feel free to submit a pull request.
 
-> ec2-user> sudo -i
-> root> cd /tmp
-> root> wget https://github.com/mieow/renfieldbot/archive/refs/heads/master.zip
-> root> unzip master.zip
-> root> cd /tmp/renfieldbot-master/scripts/
-> root> chmod u+x setup.sh
-> root> chmod a+x renfield-setup.sh
+### License
+This project is licensed under the MIT License.
 
-If migrating, replace the createtables.sql file with the database dump.
+---
 
-> root> cd /tmp/renfieldbot-master/scripts/
-> root> mv createtables.sql createtables.sql.bak
-> root> mv /tmp/dump.sql createtables.sql
-
-Edit the setup script with the database passwords and Discord information you want to use:
-
-rootpass="widurncourygb"
-renfieldpass="awdivuyhaefvyer"
-discord_token="your_discord_token"
-guild_name="your_discord_guild_name"
-guild_id="your_discord_guild_id"
-
-> root> vi setup.sh
-
-Run the setup script:
-
-> root> ./setup.sh
-
-
-### Final setup
-
-Edit the /home/renfield/.env file with your discord bot information
-
-Edit the /home/renfield/.aws/credentials file with your aws polly credentials
-
-Migrations: upload the encryption key to /home/renfield/.wp_key
-
-systemctl start renfield
-systemctl status renfield
-
-# Invite the bot to your server
-
-https://discord.com/api/oauth2/authorize?client_id=690906493742088242&permissions=1099511630848&scope=bot%20applications.commands
-add manage roles
-add speak permission
-
-# Useful pages:
-
-https://docs.aws.amazon.com/polly/latest/dg/get-started-what-next.html
-https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html
-https://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html
-https://docs.python.org/3/library/tempfile.html
+Your bot should now be up and running! 🚀 If you encounter any issues, check the logs or ask for support in the relevant community forums.
 
